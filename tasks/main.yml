@@ -50,7 +50,7 @@
     method: 'GET'
     force_basic_auth: true
     body_format: 'json'
-    validate: '{{ satellite_validate_certs }}'
+    validate_certs: '{{ satellite_validate_certs }}'
   register: '__t_versions'
   delegate_to: 'localhost'
 
