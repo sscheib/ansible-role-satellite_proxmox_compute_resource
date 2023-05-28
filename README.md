@@ -1,7 +1,7 @@
 ansible-role-satellite_proxmox_compute_ressource
 =========
 
-This role installs the community foreman plugin ForemanFogProxmox to provide Proxmox as Compute Resource in a Red Hat Satellite
+This role installs the community foreman plugin [ForemanFogProxmox](https://github.com/theforeman/foreman_fog_proxmox) to provide [Proxmox](https://www.proxmox.com) as Compute Resource in a [Red Hat Satellite](https://www.redhat.com/en/technologies/management/satellite)
 
 
 Role Variables
