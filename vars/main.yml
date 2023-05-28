@@ -1,0 +1,21 @@
+---
+# base URL of the Foreman plugin repository
+_foreman_repo_base_url: '{{ foreman_repo_base_url | default(_def_foreman_repo_base_url) }}'
+
+# name of the repository created on the Satellite host
+_foreman_repo_name: '{{ foreman_repo_name | default(_def_foreman_repo_name) }}'
+
+# file of the repository created on the Satellite host
+_foreman_repo_file: '{{ foreman_repo_file | default(_def_foreman_repo_file) }}'
+
+# description of the repository created on the Satellite host
+_foreman_repo_description: '{{ foreman_repo_description | default(_def_foreman_repo_description) }}'
+
+# name of the package which provides the Proxmox compute resource
+_foreman_proxmox_package: '{{ foreman_proxmox_package | default(_def_foreman_proxmox_package) }}'
+
+# name of the foreman-protector to disable during installation of above package
+_foreman_protector_plugin_name: '{{ foreman_protector_plugin_name | default(_def_foreman_protector_plugin_name) }}'
+
+# whether to run the satellite-installer after installing the package
+_run_satellite_installer: '{{ run_satellite_installer | default(_def_run_satellite_installer) }}'

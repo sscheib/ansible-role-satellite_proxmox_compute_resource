@@ -1,0 +1,131 @@
+---
+- name: 'Ensure required variables are defined'
+  ansible.builtin.assert:
+    that:
+      - _foreman_repo_base_url is defined
+        and _foreman_repo_base_url is string
+
+      - _foreman_repo_name is defined
+        and _foreman_repo_name is string
+
+      - _foreman_repo_file is defined
+        and _foreman_repo_file is string
+
+      - _foreman_repo_description is defined
+        and _foreman_repo_description is string
+
+      - _foreman_proxmox_package is defined
+        and _foreman_proxmox_package is string
+
+      - _foreman_protector_plugin_name is defined
+        and _foreman_protector_plugin_name is string
+
+      - satellite_server_url is defined
+        and satellite_server_url is string
+
+      - satellite_username is defined
+        and satellite_username is string
+
+      - satellite_password is defined
+        and satellite_password is string
+
+- name: 'Gather operating system facts of Satellite'
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!min'
+      - 'os_family'
+      - 'architecture'
+
+- name: 'Ensure operating system is supported'
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == 'RedHat'
+
+- name: 'Get installed Satellite and sub-components versions'
+  ansible.builtin.uri:
+    url: '{{ satellite_server_url }}/api/statuses'
+    user: '{{ satellite_username }}'
+    password: '{{ satellite_password }}'
+    method: 'GET'
+    force_basic_auth: true
+    body_format: 'json'
+    validate: '{{ satellite_validate_certs }}'
+  register: '__t_versions'
+  delegate_to: 'localhost'
+
+- name: 'Ensure expected output is received from the API'
+  ansible.builtin.assert:
+    that:
+      - __t_versions is defined
+      - __t_versions is not string
+      - __t_versions is mapping
+      - __t_versions.json.results is defined
+      - __t_versions.json.results is not string
+      - __t_versions.json.results is mapping
+      - __t_versions.json.results.foreman is defined
+      - __t_versions.json.results.foreman is not string
+      - __t_versions.json.results.foreman is mapping
+      - __t_versions.json.results.foreman.version is defined
+      - __t_versions.json.results.foreman.version is string
+
+- name: 'Extract Foreman version'
+  ansible.builtin.set_fact:
+    __t_foreman_version: "{{ __t_versions.json.results.foreman.version | regex_search('^\\d+\\.\\d+') }}"
+
+- name: 'Create repository {{ foreman_repo_name }}'
+  ansible.builtin.yum_repository:
+    name: '{{ foreman_repo_name }}'
+    file: '{{ foreman_repo_file }}'
+    description: '{{ foreman_repo_description }}'
+    baseurl: "{{ foreman_repo_base_url ~ '/' ~ __t_foreman_version ~  '/el' ~ ansible_distribution_major_version ~ '/' ~ ansible_architecture }}"
+    gpgcheck: false
+    enabled: true
+  become: true
+
+- name: 'Install {{ foreman_proxmox_package }}'
+  ansible.builtin.dnf:
+    name: '{{ foreman_proxmox_package }}'
+    update_cache: true
+    state: 'present'
+    disable_plugin: '{{ foreman_protector_plugin_name }}'
+  become: true
+  register: '__t_proxmox_package_installation'
+
+- name: 'Handle installation of package {{ foreman_proxmox_package }}'  # noqa: key-order[task] - To support older versions of Ansible the order needs to retain like this
+  block:
+
+    - name: 'Ensure repository is disabled: {{ foreman_repo_name }}'
+      ansible.builtin.yum_repository:
+        name: '{{ foreman_repo_name }}'
+        file: '{{ foreman_repo_file }}'
+        description: '{{ foreman_repo_description }}'
+        baseurl: "{{ foreman_repo_base_url ~ '/' ~ __t_foreman_version ~  '/el' ~ ansible_distribution_major_version ~ '/' ~ ansible_architecture }}"
+        gpgcheck: false
+        enabled: true
+      become: true
+
+    - name: 'Run foreman-rake db:migrate'  # noqa: command-instead-of-shell
+      ansible.builtin.shell:
+        cmd: 'foreman-rake db:migrate'
+      changed_when: true
+      become: true
+
+    - name: 'Restart Satellite services'  # noqa: command-instead-of-shell
+      ansible.builtin.shell:
+        cmd: 'satellite-maintain service restart'
+      changed_when: true
+      become: true
+
+    - name: 'Re-run satellite-installer to ensure Satellite runs properly'
+      ansible.builtin.include_role:
+        name: 'redhat.satellite_operations.installer'
+      vars:
+        ansible_become: true
+      when: >
+        _run_satellite_installer is defined
+        and _run_satellite_installer
+
+  when: >
+    __t_proxmox_package_installation.changed is defined
+    and __t_proxmox_package_installation.changed

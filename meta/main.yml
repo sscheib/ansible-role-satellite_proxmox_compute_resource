@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: 'satellite_proxmox_compute_ressource'
+  namespace: 'sscheib'
+  author: 'Steffen Scheib'
+  description: 'Installs the community foreman plugin ForemanFogProxmox to provide Proxmox as Compute Resource in a Red Hat Satellite'
+  issue_tracker_url: 'https://github.com/sscheib/ansible-role-satellite_proxmox_compute_ressource/issues'
+  license: 'GPL-2.0-or-later'
+  min_ansible_version: '2.12'
+  platforms:
+    - name: 'EL'
+      versions:
+        - '8'
+  galaxy_tags:
+    - 'satellite'
+    - 'promox'
+dependencies: []

@@ -1,0 +1,21 @@
+---
+# base URL of the Foreman plugin repository
+_def_foreman_repo_base_url: 'https://yum.theforeman.org/plugins'
+
+# name of the repository created on the Satellite host
+_def_foreman_repo_name: 'foreman-community-plugins'
+
+# file of the repository created on the Satellite host
+_def_foreman_repo_file: '{{ foreman_repo_name }}'
+
+# description of the repository created on the Satellite host
+_def_foreman_repo_description: 'Forman community plugins'
+
+# name of the package which provides the Proxmox compute resource
+_def_foreman_proxmox_package: 'rubygem-foreman_fog_proxmox'
+
+# name of the foreman-protector to disable during installation of above package
+_def_foreman_protector_plugin_name: 'foreman-protector'
+
+# whether to run the satellite-installer after installing the package
+_def_run_satellite_installer: true
