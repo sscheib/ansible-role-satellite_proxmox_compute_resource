@@ -1,16 +1,12 @@
-Role Name
+ansible-role-satellite_proxmox_compute_ressource
 =========
 
 This role installs the community foreman plugin ForemanFogProxmox to provide Proxmox as Compute Resource in a Red Hat Satellite
-
-Requirements
-------------
 
 
 Role Variables
 --------------
 
-# base URL of the Foreman plugin repository
 | variable                        | default                                 | required | description                                                                       |
 | :------------------------------ | :-------------------------------------- | :------- | :-------------------------------------------------------------------------------- |
 | `foreman_repo_base_url`         | `'https://yum.theforeman.org/plugins'`  | false    | base URL of the Foreman plugin repository                                         |
