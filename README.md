@@ -1,4 +1,4 @@
-satellite_proxmox_compute_ressource
+satellite_proxmox_compute_resource
 =========
 
 This role installs the community foreman plugin [ForemanFogProxmox](https://github.com/theforeman/foreman_fog_proxmox) to provide [Proxmox](https://www.proxmox.com) as Compute Resource in a [Red Hat Satellite](https://www.redhat.com/en/technologies/management/satellite)
@@ -38,7 +38,7 @@ Should you use the `theforeman.*` collections, simply re-assigning the variables
     satellite_server_url: '{{ foreman_server_url }}'
     [..]
   roles:
-    - name: 'ansible-role-satellite_proxmox_compute_ressource'
+    - name: 'ansible-role-satellite_proxmox_compute_resource'
 
 ```
 
