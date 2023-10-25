@@ -2,32 +2,32 @@
 - name: 'Ensure required variables are defined'
   ansible.builtin.assert:
     that:
-      - _foreman_repo_base_url is defined
-        and _foreman_repo_base_url is string
+      - '_foreman_repo_base_url is defined
+        and _foreman_repo_base_url is string'
 
-      - _foreman_repo_name is defined
-        and _foreman_repo_name is string
+      - '_foreman_repo_name is defined
+        and _foreman_repo_name is string'
 
-      - _foreman_repo_file is defined
-        and _foreman_repo_file is string
+      - '_foreman_repo_file is defined
+        and _foreman_repo_file is string'
 
-      - _foreman_repo_description is defined
-        and _foreman_repo_description is string
+      - '_foreman_repo_description is defined
+        and _foreman_repo_description is string'
 
-      - _foreman_proxmox_package is defined
-        and _foreman_proxmox_package is string
+      - '_foreman_proxmox_package is defined
+        and _foreman_proxmox_package is string'
 
-      - _foreman_protector_plugin_name is defined
-        and _foreman_protector_plugin_name is string
+      - '_foreman_protector_plugin_name is defined
+        and _foreman_protector_plugin_name is string'
 
-      - satellite_server_url is defined
-        and satellite_server_url is string
+      - 'satellite_server_url is defined
+        and satellite_server_url is string'
 
-      - satellite_username is defined
-        and satellite_username is string
+      - 'satellite_username is defined
+        and satellite_username is string'
 
-      - satellite_password is defined
-        and satellite_password is string
+      - 'satellite_password is defined
+        and satellite_password is string'
 
 - name: 'Gather operating system facts of Satellite'
   ansible.builtin.setup:
@@ -40,7 +40,7 @@
 - name: 'Ensure operating system is supported'
   ansible.builtin.assert:
     that:
-      - ansible_os_family == 'RedHat'
+      - "ansible_os_family == 'RedHat'"
 
 - name: 'Get installed Satellite and sub-components versions'
   ansible.builtin.uri:
@@ -57,17 +57,17 @@
 - name: 'Ensure expected output is received from the API'
   ansible.builtin.assert:
     that:
-      - __t_versions is defined
-      - __t_versions is not string
-      - __t_versions is mapping
-      - __t_versions.json.results is defined
-      - __t_versions.json.results is not string
-      - __t_versions.json.results is mapping
-      - __t_versions.json.results.foreman is defined
-      - __t_versions.json.results.foreman is not string
-      - __t_versions.json.results.foreman is mapping
-      - __t_versions.json.results.foreman.version is defined
-      - __t_versions.json.results.foreman.version is string
+      - '__t_versions is defined'
+      - '__t_versions is not string'
+      - '__t_versions is mapping'
+      - '__t_versions.json.results is defined'
+      - '__t_versions.json.results is not string'
+      - '__t_versions.json.results is mapping'
+      - '__t_versions.json.results.foreman is defined'
+      - '__t_versions.json.results.foreman is not string'
+      - '__t_versions.json.results.foreman is mapping'
+      - '__t_versions.json.results.foreman.version is defined'
+      - '__t_versions.json.results.foreman.version is string'
 
 - name: 'Extract Foreman version'
   ansible.builtin.set_fact:
@@ -78,7 +78,13 @@
     name: '{{ foreman_repo_name }}'
     file: '{{ foreman_repo_file }}'
     description: '{{ foreman_repo_description }}'
-    baseurl: "{{ foreman_repo_base_url ~ '/' ~ __t_foreman_version ~  '/el' ~ ansible_distribution_major_version ~ '/' ~ ansible_architecture }}"
+    baseurl: >-
+      {{
+        foreman_repo_base_url ~ '/' ~
+        __t_foreman_version ~  '/el' ~
+        ansible_distribution_major_version ~ '/' ~
+        ansible_architecture
+      }}
     gpgcheck: false
     enabled: true
   become: true
@@ -92,7 +98,10 @@
   become: true
   register: '__t_proxmox_package_installation'
 
-- name: 'Handle installation of package {{ foreman_proxmox_package }}'  # noqa: key-order[task] - To support older versions of Ansible the order needs to retain like this
+- name: 'Handle installation of package {{ foreman_proxmox_package }}'
+  when: >
+    __t_proxmox_package_installation.changed is defined
+    and __t_proxmox_package_installation.changed
   block:
 
     - name: 'Ensure repository is disabled: {{ foreman_repo_name }}'
@@ -100,7 +109,13 @@
         name: '{{ foreman_repo_name }}'
         file: '{{ foreman_repo_file }}'
         description: '{{ foreman_repo_description }}'
-        baseurl: "{{ foreman_repo_base_url ~ '/' ~ __t_foreman_version ~  '/el' ~ ansible_distribution_major_version ~ '/' ~ ansible_architecture }}"
+        baseurl: >-
+          {{
+            foreman_repo_base_url ~ '/' ~
+            __t_foreman_version ~  '/el' ~
+            ansible_distribution_major_version ~ '/' ~
+            ansible_architecture
+          }}
         gpgcheck: false
         enabled: true
       become: true
@@ -125,7 +140,4 @@
       when: >
         _run_satellite_installer is defined
         and _run_satellite_installer
-
-  when: >
-    __t_proxmox_package_installation.changed is defined
-    and __t_proxmox_package_installation.changed
+...
