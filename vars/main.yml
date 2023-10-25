@@ -19,3 +19,4 @@ _foreman_protector_plugin_name: '{{ foreman_protector_plugin_name | default(_def
 
 # whether to run the satellite-installer after installing the package
 _run_satellite_installer: '{{ run_satellite_installer | default(_def_run_satellite_installer) }}'
+...

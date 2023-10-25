@@ -19,3 +19,4 @@ _def_foreman_protector_plugin_name: 'foreman-protector'
 
 # whether to run the satellite-installer after installing the package
 _def_run_satellite_installer: true
+...
